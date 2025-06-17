@@ -1,3 +1,4 @@
+//Backend/src/routes/auth.routes.ts
 import { Router } from "express";
 import { loginMethod, getTimeToken,updateToken, getAllUsers,getUserByUsername,saveUser, updateUser,deleteUser} from "../controllers/auth_controllers";
 
