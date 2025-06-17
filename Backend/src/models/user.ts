@@ -1,5 +1,11 @@
-//Backend/src/models/user.ts
 import { Document, Types, Schema, model } from "mongoose";
+
+// Subdocumento embebido para roles
+export interface IUserRole {
+  name: string;
+  type: string;
+  Status: "Admin" | "Employee";
+}
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
@@ -9,60 +15,85 @@ export interface IUser extends Document {
   status: boolean;
   createDate: Date;
   deleteDate: Date;
-  roles: Types.ObjectId[]; // Relación con Role
+  roles: IUserRole[]; // Subdocumento embebido
   firstName: string;
   lastName: string;
 }
 
-const userSchema = new Schema<IUser>({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-
-  password: {
-    type: String,
-    required: true,
-  },
-
-  status: {
-    type: Boolean,
-    default: true,
-  },
-
-  createDate: {
-    type: Date,
-    default: Date.now,
-  },
-
-  deleteDate: {
-    type: Date,
-  },
-
-  roles: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Role", // Referencia al modelo Role
+// Schema del rol embebido (sin _id individual)
+const userRoleSchema = new Schema<IUserRole>(
+  {
+    name: {
+      type: String,
       required: true,
     },
-  ],
-
-  firstName: {
-    type: String,
-    required: true,
+    type: {
+      type: String,
+      required: true,
+    },
+    Status: {
+      type: String,
+      enum: ["Admin", "Employee"],
+      required: true,
+    },
   },
+  { _id: false }
+);
 
-  lastName: {
-    type: String,
-    required: true,
+// Schema del usuario
+const userSchema = new Schema<IUser>(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
+    status: {
+      type: Boolean,
+      default: true,
+    },
+
+    createDate: {
+      type: Date,
+      default: Date.now,
+    },
+
+    deleteDate: {
+      type: Date,
+    },
+
+    roles: {
+      type: [userRoleSchema],
+      required: true,
+      validate: [
+        (roles: IUserRole[]) => roles.length > 0,
+        "Debe contener al menos un rol",
+      ],
+    },
+
+    firstName: {
+      type: String,
+      required: true,
+    },
+
+    lastName: {
+      type: String,
+      required: true,
+    },
   },
-});
+  { versionKey: false }
+);
 
 export const User = model<IUser>("User", userSchema, "users");
