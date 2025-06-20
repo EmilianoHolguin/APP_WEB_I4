@@ -1,48 +1,47 @@
-import { Button, Checkbox, Form, Input } from 'antd';
-import React from 'react';
+//Frontend/proyecto/src/modules/User/UserForm.tsx
+import { Button, Form, Input } from 'antd';
 
-function Userform() {
-  const [form] = Form.useForm();
+function UserForm() {
+  console.log("UserForm está montado");
 
-  // Esta función se ejecuta al hacer submit correctamente
-  const handleSubmit = (values: any) => {
-    console.log('Todos los datos del formulario:', values);
-  };
+    const [form] = Form.useForm();
+    const title = 'Crear Usuario';
 
-  return (
-    <Form
-      form={form}
-      name="basic"
-      onFinish={handleSubmit} // evento de submit
-      autoComplete="off"
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        rules={[{ required: true, message: 'Por favor ingresa tu usuario' }]}
-      >
-        <Input />
-      </Form.Item>
+    const handleSubmit = async () => {
+        try {
+            const values = await form.validateFields(); // Validar y obtener todos los datos
+            console.log('All data from form', values);
+        } catch (error) {
+            console.log('Validation Failed:', error);
+        }
+    }
+    
+    return (
+        <>
+            <h2>{title}</h2>
+            <Form
+                form={form}
+                name="user-form"
+                layout="vertical"
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+            >
+                <Form.Item
+                    label="Nombre"
+                    name="nombre"
+                    rules={[{ required: true, message: 'Por favor ingresa un nombre' }]}
+                >
+                    <Input />
+                </Form.Item>
 
-      <Form.Item
-        label="Password"
-        name="password"
-        rules={[{ required: true, message: 'Por favor ingresa tu contraseña' }]}
-      >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item name="remember" valuePropName="checked">
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
-
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Enviar
-        </Button>
-      </Form.Item>
-    </Form>
-  );
+                <Form.Item>
+                    <Button type="primary" onClick={handleSubmit}>
+                        Crear Usuario
+                    </Button>
+                </Form.Item>
+            </Form>
+        </>
+    );
 }
 
-export default Userform;
+export default UserForm;
